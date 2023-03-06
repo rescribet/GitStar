@@ -5,6 +5,7 @@ import StructuralProject
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
@@ -25,6 +26,7 @@ internal fun BranchList(
     selected: String,
     handleSelect: (branch: String) -> Unit,
     handleCommit: () -> Unit,
+    handlePush: () -> Unit,
 ) {
     val scroller = rememberScrollState(0)
 
@@ -35,8 +37,13 @@ internal fun BranchList(
             .widthIn(30.dp, 200.dp),
     ) {
         Column {
-            Button(onClick = handleCommit) {
-                Text("Commit")
+            Row {
+                Button(onClick = handleCommit) {
+                    Text("Commit")
+                }
+                Button(onClick = handlePush) {
+                    Text("Push")
+                }
             }
             Text(Constants.local, fontSize = 25.sp)
             for (branch in project.branches) {

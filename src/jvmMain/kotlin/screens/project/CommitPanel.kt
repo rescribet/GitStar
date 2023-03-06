@@ -40,6 +40,7 @@ fun CommitPanel(project: Project) {
     val overview by remember { derivedStateOf { project.overview() } }
     var message by remember { mutableStateOf(TextFieldValue("")) }
     var file by remember { mutableStateOf<String?>(null) }
+    var amend by remember { mutableStateOf<Boolean>(false) }
     var diff by remember { mutableStateOf(file?.let { project.getFileDiff(it) } ?: emptyList()) }
     val updateFile = { it: DiffEntry ->
         file = it.newPath
@@ -84,15 +85,15 @@ fun CommitPanel(project: Project) {
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Checkbox(
-                        checked = false,
-                        onCheckedChange = {},
+                        checked = amend,
+                        onCheckedChange = { amend = it },
                         colors = CheckboxDefaults.colors(),
                     )
                     Text("Amend")
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    Button({ project.commit(message.text) }) {
+                    Button({ project.commit(message.text, amend) }) {
                         Text("Commit")
                     }
                 }

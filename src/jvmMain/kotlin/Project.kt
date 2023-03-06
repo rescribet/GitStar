@@ -1,10 +1,12 @@
 import com.github.syari.kgit.KGit
+import com.rescribet.gitstar.SystemCredentialsProvider
 import com.rescribet.gitstar.SystemGPGSigner
 import kotlinx.datetime.Instant
 import org.eclipse.jgit.api.ListBranchCommand
 import org.eclipse.jgit.api.errors.NoHeadException
 import org.eclipse.jgit.diff.DiffEntry
 import org.eclipse.jgit.lib.GpgSigner
+import org.eclipse.jgit.transport.CredentialsProvider
 import org.eclipse.jgit.treewalk.filter.PathFilter
 import screens.openRepo
 import java.io.File
@@ -43,7 +45,6 @@ data class Project(
     }
 
     fun config() {
-        println(git.repository.config)
         config = Configuration(
             gpgProgram = git.repository.config.getString("gpg", null, "program"),
         )
@@ -54,6 +55,13 @@ data class Project(
     fun branches(): List<String> = git
         .branchList()
         .map { it.name }
+
+    fun push() {
+        git.push {
+            add(currentBranch())
+            setCredentialsProvider(SystemCredentialsProvider(config))
+        }
+    }
 
     fun remoteBranches(): List<String> = git
         .branchList { setListMode(ListBranchCommand.ListMode.REMOTE) }
@@ -79,10 +87,11 @@ data class Project(
         unstaged = git.diff { setCached(false) },
     )
 
-    fun commit(message: String) {
+    fun commit(message: String, amend: Boolean) {
         git.commit {
             this.message = message
             setGpgSigner(SystemGPGSigner(config))
+            setAmend(amend)
         }
     }
 

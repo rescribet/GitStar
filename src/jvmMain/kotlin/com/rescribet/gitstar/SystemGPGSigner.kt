@@ -11,22 +11,15 @@ class SystemGPGSigner(val config: Configuration) : GpgSigner() {
         commit: CommitBuilder?,
         gpgSigningKey: String?,
         committer: PersonIdent?,
-        credentialsProvider: CredentialsProvider?
+        credentialsProvider: CredentialsProvider?,
     ) {
-        println(commit)
-        println(gpgSigningKey)
-        println(committer)
-        println(credentialsProvider)
     }
 
     override fun canLocateSigningKey(
         gpgSigningKey: String?,
         committer: PersonIdent?,
-        credentialsProvider: CredentialsProvider?
+        credentialsProvider: CredentialsProvider?,
     ): Boolean {
-        println(gpgSigningKey)
-        println(committer)
-        println(credentialsProvider)
         return true
     }
 }

@@ -50,6 +50,7 @@ fun ProjectScreen(projectFull: Project) {
                 selectedBranch,
                 selectBranch,
                 handleCommit = { activePanel = ProjectScreens.Commit },
+                handlePush = { projectFull.push() },
             )
 
             Divider(
