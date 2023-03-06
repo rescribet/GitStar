@@ -1,4 +1,4 @@
-package screens.repository
+package screens.project
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,6 +14,7 @@ import androidx.compose.ui.input.pointer.PointerIconDefaults
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import prettyName
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -34,7 +35,7 @@ internal fun Branch(
             .pointerHoverIcon(PointerIconDefaults.Hand)
             .clickable { onClick(name) }
             .padding(horizontal = 10.dp, vertical = 15.dp),
-        text = name,
+        text = name.prettyName(),
         color = foreground,
         fontWeight = weight,
     )

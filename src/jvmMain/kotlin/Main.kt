@@ -12,7 +12,7 @@ import screens.ProjectPickerScreen
 fun main() = application {
     val applicationState = remember { ApplicationState() }
     var isVisible by remember { mutableStateOf(true) }
-    val icon = painterResource("account_tree_white.svg")
+    val icon = painterResource("gitstar.svg")
 
     Tray(
         icon = icon,
@@ -38,12 +38,3 @@ fun main() = application {
         }
     }
 }
-
-// object TrayIcon : Painter() {
-//    override val intrinsicSize = Size(256f, 256f)
-//
-//    override fun DrawScope.onDraw() {
-//        drawOval(Color(0xFFFFA500))
-//        drawLine(Color(0xFF000000), Offset(0f, 64f), Offset(256f, 64f), strokeWidth = 3f)
-//    }
-// }

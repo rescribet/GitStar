@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import getProjects
 import org.eclipse.jgit.lib.Repository
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
+import prettyName
 import java.io.File
 
 fun openRepo(dir: File): Repository = FileRepositoryBuilder()
@@ -103,7 +104,7 @@ fun ProjectRow(project: Project, onClick: (project: Project) -> Unit) {
 
     val annotatedString = buildAnnotatedString {
         appendInlineContent("branchIcon")
-        append(project.currentBranch())
+        append(project.currentBranch().prettyName())
     }
 
     Box(

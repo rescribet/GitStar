@@ -26,6 +26,7 @@ kotlin {
                 implementation(compose.desktop.currentOs)
 
                 implementation("com.github.sya-ri:kgit:1.0.5")
+                implementation("org.eclipse.jgit:org.eclipse.jgit.gpg.bc:5.11.0.202103091610-r")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
                 implementation("com.alialbaali.kamel:kamel-image:0.4.1")
                 implementation("io.ktor:ktor-client-java:2.2.3")
