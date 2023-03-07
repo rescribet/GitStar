@@ -28,6 +28,7 @@ fun main() = application {
         onCloseRequest = { isVisible = false },
         visible = isVisible,
         title = Constants.appName,
+        icon = icon,
     ) {
         ProjectPickerScreen(onOpen = { applicationState.openNewWindow(it) })
     }

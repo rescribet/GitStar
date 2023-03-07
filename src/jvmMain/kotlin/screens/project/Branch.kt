@@ -24,8 +24,8 @@ internal fun Branch(
     checkedOut: Boolean,
     onClick: (name: String) -> Unit,
 ) {
-    val background = if (selected) MaterialTheme.colors.secondary else Color.Unspecified
-    val foreground = if (selected) MaterialTheme.colors.onSecondary else Color.Unspecified
+    val background = if (selected) MaterialTheme.colors.secondaryVariant else Color.Unspecified
+    val foreground = if (selected) MaterialTheme.colors.onPrimary else Color.Unspecified
     val weight = if (checkedOut) FontWeight.Bold else FontWeight.Normal
 
     Text(

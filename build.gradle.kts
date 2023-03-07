@@ -1,4 +1,3 @@
-import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
@@ -15,6 +14,7 @@ repositories {
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
+@OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
 kotlin {
     jvm {
         jvmToolchain(11)
@@ -24,6 +24,11 @@ kotlin {
         val jvmMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
+                implementation(compose.desktop.components.splitPane)
+
+                implementation(libs.kotlin.logging)
+                runtimeOnly(libs.log4j.slf4j2)
+                runtimeOnly(libs.log4j.core)
 
                 implementation("com.github.sya-ri:kgit:1.0.5")
                 implementation("org.eclipse.jgit:org.eclipse.jgit.gpg.bc:5.11.0.202103091610-r")
@@ -41,8 +46,14 @@ compose.desktop {
         mainClass = "MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "switchman"
+            packageName = "gitstar"
             packageVersion = "1.0.0"
+
+            val iconsRoot = project.file("src/jvmMain/resources")
+
+            macOS {
+                iconFile.set(iconsRoot.resolve("gitstar.png"))
+            }
         }
     }
 }

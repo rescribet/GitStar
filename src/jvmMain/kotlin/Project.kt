@@ -5,8 +5,7 @@ import kotlinx.datetime.Instant
 import org.eclipse.jgit.api.ListBranchCommand
 import org.eclipse.jgit.api.errors.NoHeadException
 import org.eclipse.jgit.diff.DiffEntry
-import org.eclipse.jgit.lib.GpgSigner
-import org.eclipse.jgit.transport.CredentialsProvider
+import org.eclipse.jgit.lib.ProgressMonitor
 import org.eclipse.jgit.treewalk.filter.PathFilter
 import screens.openRepo
 import java.io.File
@@ -39,8 +38,8 @@ data class Project(
             git = KGit.wrap(openRepo(path))
             config()
         } catch (e: Exception) {
+//            e.printStackTrace()
             println("Error opening ${path.path}")
-            e.printStackTrace()
         }
     }
 
@@ -50,16 +49,44 @@ data class Project(
         )
     }
 
-    fun currentBranch(): String = git.repository.fullBranch ?: "-"
+    fun currentBranch(): String = try {
+        git.repository.fullBranch ?: "-"
+    } catch (e: FileSystemException) {
+        "err"
+    }
 
     fun branches(): List<String> = git
         .branchList()
         .map { it.name }
 
     fun push() {
+        val monitor = object : ProgressMonitor {
+            override fun start(totalTasks: Int) {
+                println("total: $totalTasks")
+            }
+
+            override fun beginTask(title: String?, totalWork: Int) {
+                println("$title, $totalWork")
+            }
+
+            override fun update(completed: Int) {
+                println("completed: $completed")
+            }
+
+            override fun endTask() {
+                println("end")
+            }
+
+            override fun isCancelled(): Boolean {
+                return false
+            }
+        }
+
         git.push {
+            progressMonitor = monitor
             add(currentBranch())
             setCredentialsProvider(SystemCredentialsProvider(config))
+//            call()
         }
     }
 
@@ -122,6 +149,7 @@ data class Project(
         commits = commits(),
         branches = branches(),
         remoteBranches = remoteBranches(),
+        overview = overview(),
     )
 
     override fun hashCode(): Int {
@@ -136,6 +164,7 @@ data class StructuralProject(
     val commits: List<Commit>,
     val branches: List<String>,
     val remoteBranches: List<String>,
+    val overview: Overview,
 )
 
 data class Overview(

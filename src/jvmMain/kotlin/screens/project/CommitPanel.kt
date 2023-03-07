@@ -24,34 +24,43 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import org.eclipse.jgit.diff.DiffEntry
+import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
+import org.jetbrains.compose.splitpane.VerticalSplitPane
+import org.jetbrains.skiko.Cursor
 
 @Composable
-fun CommitPanel(project: Project) {
-    val overview by remember { derivedStateOf { project.overview() } }
+fun CommitPanel(projectFull: Project) {
+    var project by remember { mutableStateOf(projectFull.structural()) }
     var message by remember { mutableStateOf(TextFieldValue("")) }
     var file by remember { mutableStateOf<String?>(null) }
     var amend by remember { mutableStateOf<Boolean>(false) }
-    var diff by remember { mutableStateOf(file?.let { project.getFileDiff(it) } ?: emptyList()) }
+    var diff by remember { mutableStateOf(file?.let { projectFull.getFileDiff(it) } ?: emptyList()) }
     val updateFile = { it: DiffEntry ->
         file = it.newPath
-        diff = project.getFileDiff(it.newPath)
+        diff = projectFull.getFileDiff(it.newPath)
     }
     val changeStaged: (Boolean, DiffEntry) -> Unit = { checked, it ->
         if (checked) {
-            project.stage(it)
+            projectFull.stage(it)
         } else {
-            project.unstage(it)
+            projectFull.unstage(it)
         }
+        project = projectFull.structural()
+    }
+    val commit = {
+        projectFull.commit(message.text, amend)
+        project = projectFull.structural()
     }
 
     Column {
@@ -59,7 +68,7 @@ fun CommitPanel(project: Project) {
             modifier = Modifier.weight(1f),
         ) {
             Row {
-                FileSelector(overview, updateFile, changeStaged)
+                FileSelector(project.overview, updateFile, changeStaged)
                 FileViewer(
                     modifier = Modifier.weight(.8f),
                     file,
@@ -93,7 +102,7 @@ fun CommitPanel(project: Project) {
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    Button({ project.commit(message.text, amend) }) {
+                    Button(commit) {
                         Text("Commit")
                     }
                 }
@@ -102,15 +111,15 @@ fun CommitPanel(project: Project) {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalSplitPaneApi::class)
 @Composable
 fun FileSelector(overview: Overview, onSelect: (it: DiffEntry) -> Unit, onChangeStaged: (Boolean, DiffEntry) -> Unit) {
     Box(modifier = Modifier.widthIn(100.dp, 500.dp)) {
         if (overview.isClean) {
             Text("Nothing to commit")
         } else {
-            Column {
-                Box(modifier = Modifier.weight(.5f)) {
+            VerticalSplitPane {
+                first(200.dp) {
                     LazyColumn {
                         stickyHeader {
                             Text(
@@ -149,8 +158,8 @@ fun FileSelector(overview: Overview, onSelect: (it: DiffEntry) -> Unit, onChange
                         }
                     }
                 }
-                Divider(modifier = Modifier.fillMaxWidth())
-                Box(modifier = Modifier.weight(.5f)) {
+
+                second {
                     LazyColumn {
                         stickyHeader {
                             Text(
@@ -187,6 +196,21 @@ fun FileSelector(overview: Overview, onSelect: (it: DiffEntry) -> Unit, onChange
                                 }
                             }
                         }
+                    }
+                }
+
+                splitter {
+                    handle {
+                        Divider(
+                            modifier = Modifier
+                                .markAsHandle()
+                                .fillMaxWidth()
+                                .pointerHoverIcon(PointerIcon(Cursor(Cursor.S_RESIZE_CURSOR))),
+                        )
+                    }
+
+                    visiblePart {
+                        Divider(modifier = Modifier.fillMaxWidth())
                     }
                 }
             }
