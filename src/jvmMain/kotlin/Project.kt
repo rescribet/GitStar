@@ -8,6 +8,7 @@ import org.eclipse.jgit.diff.DiffEntry
 import org.eclipse.jgit.lib.ProgressMonitor
 import org.eclipse.jgit.treewalk.filter.PathFilter
 import screens.openRepo
+import java.io.ByteArrayOutputStream
 import java.io.File
 
 data class Commit(
@@ -103,9 +104,16 @@ data class Project(
 
     fun worksProperly(): Boolean = currentBranch() != "-"
 
-    fun getFileDiff(file: String): List<DiffEntry> = git.diff {
-        setCached(true)
-        setPathFilter(PathFilter.create(file))
+    fun getFileDiff(file: String): Pair<DiffEntry, List<String>> = ByteArrayOutputStream().use { stream ->
+        val entry = git.diff {
+            setCached(overview().staged.map { it.newPath ?: it.oldPath }.contains(file))
+            setContextLines(2)
+            setPathFilter(PathFilter.create(file))
+            setShowNameAndStatusOnly(false)
+            setOutputStream(stream)
+        }
+
+        Pair(entry.first(), String(stream.toByteArray()).split("\n"))
     }
 
     fun overview(): Overview = Overview(
